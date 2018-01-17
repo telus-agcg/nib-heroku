@@ -1,0 +1,53 @@
+#!/usr/bin/env ruby
+
+require 'nib/heroku'
+
+desc 'Access logs for the speified service or Heroku application'
+arg :service
+command :logs do |c|
+  c.flag(
+    %i(e env),
+    arg_name: 'ENVIRONMENT',
+    desc: 'Specify the environment (app)',
+    default_value: :dev
+  )
+  c.switch(
+    %i(f follow),
+    desc: 'Attached to a stream of log output'
+  )
+  c.flag(
+    %i(n num),
+    arg_name: 'NUM',
+    desc: 'Number of lines to display'
+  )
+
+  c.action do |_global_options, options, args|
+    Nib::Heroku.logs(args.first, options.slice(:env, :follow, :num))
+  end
+end
+
+desc 'Start a shell session in a one-off container or Heroku dyno'
+arg :service
+arg :command, %i(optional multiple)
+command :shell do |c|
+  c.flag(
+    %i(e env),
+    arg_name: 'ENVIRONMENT',
+    desc: 'Specify the environment (app)',
+    default_value: :dev
+  )
+  c.flag(
+    %i(s size),
+    arg_name: 'SIZE',
+    desc: 'Size of the dyno to be started'
+  )
+  c.flag(
+    %i(type),
+    arg_name: 'TYPE',
+    desc: 'Process type'
+  )
+
+  c.action do |_global_options, options, args|
+    Nib::Heroku.shell(args, options.slice(:env, :size, :type))
+  end
+end
